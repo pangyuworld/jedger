@@ -1,5 +1,6 @@
 package com.ledger.core.beans.vo.category;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -26,6 +27,7 @@ public class CategoryForm {
     /**
      * 品类ID
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long categoryId;
     /**
      * 品类类型

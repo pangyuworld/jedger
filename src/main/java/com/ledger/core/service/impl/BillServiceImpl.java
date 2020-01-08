@@ -1,7 +1,11 @@
 package com.ledger.core.service.impl;
 
 import com.ledger.core.beans.po.Bill;
+import com.ledger.core.beans.po.BillEntire;
 import com.ledger.core.beans.vo.bill.BillAddForm;
+import com.ledger.core.beans.vo.bill.BillEntireForm;
+import com.ledger.core.beans.vo.category.CategoryForm;
+import com.ledger.core.beans.vo.user.UserInfoForm;
 import com.ledger.core.common.exception.UserActionException;
 import com.ledger.core.common.rest.ResponseEnum;
 import com.ledger.core.mapper.BillMapper;
@@ -10,6 +14,10 @@ import com.ledger.core.service.BillService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author pang
@@ -54,5 +62,65 @@ public class BillServiceImpl implements BillService {
         boolean result = billMapper.addNewBill(bill) > 0;
         log.debug("向数据库添加账单,bill={},result={}", bill, result);
         return result;
+    }
+
+    /**
+     * 获取用户的全部账单
+     *
+     * @param userId 用户ID
+     * @return 用户的全部账单
+     */
+    @Override
+    public List<BillEntireForm> getAllBill(Long userId) {
+        // 获取全部订单
+        List<BillEntire> billEntireList = billMapper.getAllBill(userId);
+
+        List<BillEntireForm> billEntireFormList = billEntireList2BillEntireFormList(billEntireList);
+        log.debug("获取用户全部订单,userId={},billEntireFormList={}", userId, billEntireFormList);
+        // 将订单PO转换为VO
+        return billEntireFormList;
+    }
+
+    /**
+     * 获取用户某一时间段内的账单
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @param userId    用户ID
+     * @return 用户在该段时间的账单
+     */
+    @Override
+    public List<BillEntireForm> getBillByTime(Date startTime, Date endTime, Long userId) {
+        // 获取全部订单
+        List<BillEntire> billEntireList = billMapper.getBillByTime(startTime, endTime, userId);
+        // 将订单PO转换为VO
+        List<BillEntireForm> billEntireFormList = billEntireList2BillEntireFormList(billEntireList);
+        log.debug("获取一段时间内的订单全部订单,userId={},startTime={},endTime={}", userId, startTime, endTime);
+        return billEntireFormList;
+    }
+
+    /**
+     * 将PO转换为VO
+     */
+    private List<BillEntireForm> billEntireList2BillEntireFormList(List<BillEntire> billEntireList) {
+        List<BillEntireForm> billEntireFormList = new LinkedList<>();
+        for (BillEntire billEntire : billEntireList) {
+            BillEntireForm billEntireForm = new BillEntireForm();
+            UserInfoForm userInfoForm = new UserInfoForm();
+            CategoryForm categoryForm = new CategoryForm();
+            billEntireForm.setBillPrice(billEntire.getBillPrice());
+            billEntireForm.setBillRemark(billEntire.getBillRemark());
+            billEntireForm.setBillTime(billEntire.getBillTime());
+            userInfoForm.setUserGender(billEntire.getUserInfo()
+                    .getUserGender() ? UserInfoForm.MAN : UserInfoForm.WOMAN);
+            userInfoForm.setUserRealName(billEntire.getUserInfo().getUserRealName());
+            billEntireForm.setUserInfo(userInfoForm);
+            categoryForm.setCategoryName(billEntire.getCategory().getCategoryName());
+            categoryForm.setCategoryType(billEntire.getCategory()
+                    .getCategoryType() ? CategoryForm.INCOME : CategoryForm.EXPENSES);
+            billEntireForm.setCategory(categoryForm);
+            billEntireFormList.add(billEntireForm);
+        }
+        return billEntireFormList;
     }
 }

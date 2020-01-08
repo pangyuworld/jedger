@@ -7,13 +7,68 @@
         <result column="bill_remark" property="billRemark" jdbcType="VARCHAR"/>
         <result column="bill_price" property="billPrice" jdbcType="DOUBLE"/>
         <result column="bill_time" property="billTime" jdbcType="TIMESTAMP"/>
-        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
-        <result column="category_id" property="categoryId" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="category_id" property="categoryId" jdbcType="INTEGER"/>
+    </resultMap>
+    <!--  完整的返回  -->
+    <resultMap id="billEntire" type="com.ledger.core.beans.po.BillEntire">
+        <id column="bill_id" property="billId" jdbcType="INTEGER"/>
+        <result column="bill_remark" property="billRemark" jdbcType="VARCHAR"/>
+        <result column="bill_price" property="billPrice" jdbcType="DOUBLE"/>
+        <result column="bill_time" property="billTime" jdbcType="TIMESTAMP"/>
+        <result column="user_id" property="userInfo.userId" jdbcType="INTEGER"/>
+        <result column="category_id" property="category.categoryId" jdbcType="INTEGER"/>
+        <result column="category_type" property="category.categoryType" jdbcType="BIT"/>
+        <result column="category_name" property="category.categoryName" jdbcType="VARCHAR"/>
+        <result column="user_name" property="userInfo.userName" jdbcType="VARCHAR"/>
+        <result column="user_gender" property="userInfo.userGender" jdbcType="BIT"/>
+        <result column="user_real_name" property="userInfo.userRealName" jdbcType="VARCHAR"/>
     </resultMap>
     <!--  添加新的账单  -->
     <insert id="addNewBill" parameterType="com.ledger.core.beans.po.Bill" useGeneratedKeys="true" keyProperty="billId">
-        insert into t_bill(bill_time, bill_price, bill_remark, user_id, category_id) VALUES
-        (#{billTime},#{billPrice},#{billRemark},#{userId},#{categoryId})
+        insert into t_bill(bill_time, bill_price, bill_remark, user_id, category_id)
+        VALUES (#{billTime}, #{billPrice}, #{billRemark}, #{userId}, #{categoryId})
     </insert>
+    <!--  返回用户的全部账单  -->
+    <select id="getAllBill" resultMap="billEntire">
+        select bill_id,
+               bill_time,
+               bill_price,
+               bill_remark,
+               a.user_id     as user_id,
+               a.category_id as category_id,
+               category_type,
+               category_name,
+               user_gender,
+               user_name,
+               user_password,
+               user_real_name
+        from t_bill a
+                 inner join t_category tc on a.category_id = tc.category_id
+                 inner join t_user tu on a.user_id = tu.user_id
+        where a.user_id = #{userId}
+        order by bill_time desc
+    </select>
+    <select id="getBillByTime" resultMap="billEntire">
+        select bill_id,
+               bill_time,
+               bill_price,
+               bill_remark,
+               a.user_id     as user_id,
+               a.category_id as category_id,
+               category_type,
+               category_name,
+               user_gender,
+               user_name,
+               user_password,
+               user_real_name
+        from t_bill a
+                 inner join t_category tc on a.category_id = tc.category_id
+                 inner join t_user tu on a.user_id = tu.user_id
+        where a.user_id = #{userId}
+          and bill_time BETWEEN #{startTime,javaType=date}
+            and #{endTime,javaType=date}
+        order by bill_time desc
+    </select>
 
 </mapper>

@@ -92,7 +92,6 @@ public class UserServiceImpl implements UserService {
         UserInfoForm userInfoForm = new UserInfoForm();
         userInfoForm.setUserGender(userInfo.getUserGender() ? UserInfoForm.MAN : UserInfoForm.WOMAN);
         userInfoForm.setUserRealName(userInfo.getUserRealName());
-        userInfoForm.setUserName(userInfo.getUserName());
         userInfoForm.setToken(token);
         log.debug("登录成功,userLoginForm={}", userLoginForm);
         return userInfoForm;
@@ -122,7 +121,6 @@ public class UserServiceImpl implements UserService {
         UserInfoForm userInfoForm = new UserInfoForm();
         userInfoForm.setUserGender(userInfo.getUserGender() ? UserInfoForm.MAN : UserInfoForm.WOMAN);
         userInfoForm.setUserRealName(userInfo.getUserRealName());
-        userInfoForm.setUserName(userInfo.getUserName());
         log.debug("得到更新后的用户信息,userInfoForm={}", userInfoForm);
         return userInfoForm;
     }
@@ -140,7 +138,6 @@ public class UserServiceImpl implements UserService {
         UserInfoForm userInfoForm = new UserInfoForm();
         userInfoForm.setUserGender(userInfo.getUserGender() ? UserInfoForm.MAN : UserInfoForm.WOMAN);
         userInfoForm.setUserRealName(userInfo.getUserRealName());
-        userInfoForm.setUserName(userInfo.getUserName());
         return userInfoForm;
     }
 }

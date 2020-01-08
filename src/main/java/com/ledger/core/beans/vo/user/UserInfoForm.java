@@ -20,10 +20,6 @@ public class UserInfoForm {
     public static final String MAN = "帅哥";
     public static final String WOMAN = "美女";
     /**
-     * 登录名
-     */
-    private String userName;
-    /**
      * 用户真实姓名
      */
     private String userRealName;
