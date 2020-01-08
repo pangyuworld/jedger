@@ -1,0 +1,29 @@
+# config/i-review-dao:dev/dao-config
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: yu999?//
+    url: jdbc:mysql://localhost:3306/ledger?serverTimezone=GMT&useUnicode=true&characterEncoding=utf8
+    username: pang
+  redis:
+    database: 1
+    host: localhost
+    jedis:
+      pool:
+        max-active: 16
+        max-idle: 16
+        max-wait: -1
+        min-idle: 0
+    password: ''
+    port: 6379
+    timeout: 5000
+mybatis:
+  mapper-locations: classpath:mapping/*Mapper.xml
+  type-aliases-package: com.ocean.pojo
+logging:
+  level:
+    com.ledger.core: debug
+server:
+  port: 8080
+token:
+  ttl: 7200000

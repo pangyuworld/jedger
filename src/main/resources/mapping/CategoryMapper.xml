@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ledger.core.mapper.CategoryMapper">
+    <!--  基础的返回  -->
+    <resultMap id="category" type="com.ledger.core.beans.po.Category">
+        <id column="category_id" property="categoryId" jdbcType="INTEGER"/>
+        <result column="category_type" property="categoryType" jdbcType="BIT"/>
+        <result column="category_name" property="categoryName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--  添加账目品类  -->
+    <insert id="addNewCategory" parameterType="com.ledger.core.beans.po.Category" useGeneratedKeys="true"
+            keyProperty="categoryId">
+        insert into t_category(category_type, category_name) VALUES
+        (#{categoryType},#{categoryName})
+    </insert>
+    <!--  获取支出商品品类  -->
+    <select id="getExpensesCategory" resultMap="category">
+        select category_id, category_type, category_name
+        from t_category
+        where category_type=1
+    </select>
+    <!--  获取收入商品品类  -->
+    <select id="getIncomeCategory" resultMap="category">
+        select category_id, category_type, category_name
+        from t_category
+        where category_type=0
+    </select>
+
+</mapper>
