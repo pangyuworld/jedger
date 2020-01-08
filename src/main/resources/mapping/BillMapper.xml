@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ledger.core.mapper.BillMapper">
+    <!--  基础的返回  -->
+    <resultMap id="bill" type="com.ledger.core.beans.po.Bill">
+        <id column="bill_id" property="billId" jdbcType="INTEGER"/>
+        <result column="bill_remark" property="billRemark" jdbcType="VARCHAR"/>
+        <result column="bill_price" property="billPrice" jdbcType="DOUBLE"/>
+        <result column="bill_time" property="billTime" jdbcType="TIMESTAMP"/>
+        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
+        <result column="category_id" property="categoryId" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--  添加新的账单  -->
+    <insert id="addNewBill" parameterType="com.ledger.core.beans.po.Bill" useGeneratedKeys="true" keyProperty="billId">
+        insert into t_bill(bill_time, bill_price, bill_remark, user_id, category_id) VALUES
+        (#{billTime},#{billPrice},#{billRemark},#{userId},#{categoryId})
+    </insert>
+
+</mapper>

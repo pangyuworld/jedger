@@ -26,5 +26,11 @@
         from t_category
         where category_type=0
     </select>
+    <!--  判断品类ID是否存在  -->
+    <select id="existsByCategoryId" resultType="boolean">
+        select category_type
+        from t_category
+        where category_id=#{categoryId}
+    </select>
 
 </mapper>

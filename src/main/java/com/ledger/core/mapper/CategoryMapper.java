@@ -23,13 +23,23 @@ public interface CategoryMapper {
 
     /**
      * 获取支出账目品类
+     *
      * @return 支出账目品类的列表
      */
     List<Category> getExpensesCategory();
 
     /**
      * 获取收入账目品类
+     *
      * @return 收入账目品类列表
      */
     List<Category> getIncomeCategory();
+
+    /**
+     * 根据ID判断账目品类是否存在
+     *
+     * @param categoryId 账目品列ID
+     * @return 存在返回1，不存在返回0
+     */
+    Boolean existsByCategoryId(Long categoryId);
 }

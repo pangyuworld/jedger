@@ -47,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
             throw new UserActionException(ResponseEnum.BAD_REQUEST);
         }
         // 转换完成，开始插入
-        boolean result = categoryMapper.addNewCategory(category) > 0;
+        Boolean result = categoryMapper.addNewCategory(category) > 0;
         log.debug("向数据库插入新的账目品类,category={},result={}", category, result);
         categoryForm.setCategoryId(category.getCategoryId());
         log.debug("添加新的账目品类完成,categoryForm={}", category);

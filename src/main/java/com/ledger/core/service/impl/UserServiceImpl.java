@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
         userInfo.setUserId(userId);
         userInfo.setUserRealName(userUpdateForm.getUserRealName());
         userInfo.setUserGender(userUpdateForm.getUserGender());
-        boolean result = userInfoMapper.editUserInfo(userInfo) > 0;
+        Boolean result = userInfoMapper.editUserInfo(userInfo) > 0;
         log.debug("更新用户信息,userInfo={},result={}", userInfo, result);
         // 将PO转换为VO
         userInfo = userInfoMapper.getUserInfoByUserId(userId);
