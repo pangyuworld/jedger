@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ledger.core.mapper.BudgetMapper">
+    <!--  基础的返回  -->
+    <resultMap id="budget" type="com.ledger.core.beans.po.Budget">
+        <id column="budget_id" property="budgetId" jdbcType="INTEGER"/>
+        <result column="budget_remark" property="budgetRemark" jdbcType="VARCHAR"/>
+        <result column="budget_price" property="budgetPrice" jdbcType="DOUBLE"/>
+        <result column="budget_time" property="budgetTime" jdbcType="TIMESTAMP"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+    </resultMap>
+    <!--  添加新的预算  -->
+    <insert id="addNewBudget" parameterType="com.ledger.core.beans.po.Budget" useGeneratedKeys="true"
+            keyProperty="budgetId">
+        insert into t_budget(budget_time, budget_price, user_id, budget_remark)
+        VALUES (#{budgetTime}, #{budgetPrice}, #{userId}, #{budgetRemark})
+    </insert>
+    <!--  更新预算信息  -->
+    <update id="updateBudget">
+        update t_budget
+        <set>
+            <if test="budgetRemark != null">
+                budget_remark=#{budgetRemark},
+            </if>
+            <if test="budgetPrice != null">
+                budget_price=#{budgetPrice},
+            </if>
+        </set>
+        where user_id=#{userId} and budget_id=#{budgetId}
+    </update>
+    <!--  删除预算信息  -->
+    <delete id="deleteBudget">
+        delete
+        from t_budget
+        where budget_id = #{budgetId}
+          and user_id = #{userId}
+    </delete>
+    <!--  查询用户某一月的预算  -->
+    <select id="getBudgetByTime" resultMap="budget">
+        select budget_id,
+               budget_time,
+               budget_price,
+               budget_remark
+        from t_budget
+        where user_id = #{userId}
+          and budget_time = #{time,jdbcType=DATE}
+    </select>
+    <!--  查询用户全部的预算信息  -->
+    <select id="getAllBudget" resultMap="budget">
+        select budget_id,
+               budget_time,
+               budget_price,
+               budget_remark
+        from t_budget
+        where user_id = #{userId}
+    </select>
+    <!--  根据ID获取预算信息  -->
+    <select id="getBudgetByBudgetId" resultMap="budget">
+        select budget_id,
+               budget_time,
+               budget_price,
+               budget_remark
+        from t_budget
+        where budget_id = #{budgetId}
+    </select>
+</mapper>

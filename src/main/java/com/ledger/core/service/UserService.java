@@ -1,6 +1,5 @@
 package com.ledger.core.service;
 
-import com.ledger.core.beans.po.UserInfo;
 import com.ledger.core.beans.vo.user.UserInfoForm;
 import com.ledger.core.beans.vo.user.UserLoginForm;
 import com.ledger.core.beans.vo.user.UserRegisterForm;

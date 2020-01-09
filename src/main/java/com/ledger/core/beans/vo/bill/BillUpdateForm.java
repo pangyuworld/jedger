@@ -14,27 +14,31 @@ import java.util.Date;
 /**
  * @author pang
  * @version V1.0
- * @ClassName: BillAddForm
+ * @ClassName: BillUpdateForm
  * @Package com.ledger.core.beans.vo.bill
- * @description: 添加账单表单
- * @date 2020/1/8 21:51
+ * @description: 账单更新表单
+ * @date 2020/1/9 10:59
  */
 @Data
 @ToString
 @EqualsAndHashCode
-public class BillAddForm {
+public class BillUpdateForm {
+    /**
+     * 账单ID
+     */
+    @NotNull(message = "账单ID不能为空")
+    @Min(value = 0, message = "账单ID不能小于0")
+    private Long billId;
     /**
      * 记录账单的时间
      */
-    @NotNull(message = "记录时间不能为空")
-    @Past(message = "不能记录未来的账")
+    @Past(message = "记账时间不能是未来的时间")
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd HH:mm:ss")
     private Date billTime;
     /**
      * 记录账单的金额
      */
-    @NotNull(message = "记录金额不能为空")
-    @Min(value = 0, message = "记录金额不能小于0")
+    @Min(value = 0, message = "记账金额不能小于0")
     private Double billPrice;
     /**
      * 记录账单时候的备注
@@ -44,6 +48,6 @@ public class BillAddForm {
     /**
      * 账单品类
      */
-    @Min(value = 0, message = "记录类型不存在")
-    private Long category;
+    @Min(value = 0, message = "账单品类ID不能小于0")
+    private Long categoryId;
 }

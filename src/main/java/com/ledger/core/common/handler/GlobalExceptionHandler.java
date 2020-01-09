@@ -90,4 +90,11 @@ public class GlobalExceptionHandler {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         return new ResponseJSON<>("token过期，请重新登录", ResponseEnum.NOT_LOGIN);
     }
+
+    @ExceptionHandler(value = Exception.class)
+    public ResponseJSON<String> otherExceptionsHandler(Exception e, HttpServletResponse response) {
+        log.warn("发生其他异常,异常类型={}", e.getClass(), e);
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return new ResponseJSON<>("系统发生未知异常，请联系网站管理员", ResponseEnum.SYSTEM_ERROR);
+    }
 }

@@ -3,7 +3,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: yu999?//
-    url: jdbc:mysql://localhost:3306/ledger?serverTimezone=GMT&useUnicode=true&characterEncoding=utf8
+    url: jdbc:mysql://localhost:3306/ledger?serverTimezone=Hongkong&useUnicode=true&characterEncoding=utf8
     username: pang
   redis:
     database: 1

@@ -8,10 +8,11 @@ package com.ledger.core.common.exception;
  * @description: 参数异常错误
  * @date 2019/12/17 19:50
  */
-public class ParameterBadException extends RuntimeException{
-    public ParameterBadException(){
+public class ParameterBadException extends RuntimeException {
+    public ParameterBadException() {
         this("参数错误");
     }
+
     public ParameterBadException(String message) {
         super(message);
     }
