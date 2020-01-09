@@ -3,6 +3,8 @@ package com.ledger.core.controller;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ledger.core.beans.vo.bill.BillAddForm;
 import com.ledger.core.beans.vo.bill.BillEntireForm;
+import com.ledger.core.beans.vo.bill.BillForm;
+import com.ledger.core.beans.vo.bill.BillMonthForm;
 import com.ledger.core.common.rest.ResponseEnum;
 import com.ledger.core.common.rest.ResponseJSON;
 import com.ledger.core.service.BillService;
@@ -52,18 +54,44 @@ public class BillController {
     @RequestMapping(value = "/time", method = RequestMethod.GET)
     public ResponseJSON<List<BillEntireForm>> getAllBillByTime(@RequestAttribute
                                                                        Long userId,
+                                                               @Valid
                                                                @RequestParam
                                                                @NotNull(message = "开始时间不能为空")
                                                                @Past(message = "开始时间必须为以前的一个时间")
-                                                               @JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd HH:mm:ss")
+                                                               @JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd")
                                                                        Date startTime,
+                                                               @Valid
                                                                @RequestParam
                                                                @NotNull(message = "结束时间不能为空")
-                                                               @Past(message = "结束时间必须为以前的一个时间")
-                                                               @JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd HH:mm:ss")
+                                                               @JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd")
                                                                        Date endTime) {
         log.debug("获取用户一段时间内的账单,userId={},start={},end={}", userId, startTime, endTime);
         return new ResponseJSON<>(billService.getBillByTime(startTime, endTime, userId), ResponseEnum.SUCCESS_OPTION);
     }
 
+    @Token
+    @RequestMapping(value = "/sum/time/day", method = RequestMethod.GET)
+    public ResponseJSON<BillForm> getSumBillByDay(@RequestAttribute
+                                                          Long userId,
+                                                  @Valid
+                                                  @RequestParam
+                                                  @NotNull(message = "时间不能为空")
+                                                  @JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd")
+                                                          Date time) {
+        log.debug("查询用户某天的总账单,userId={},time={}", userId, time);
+        return new ResponseJSON<>(billService.getSumBillByDay(userId, time), ResponseEnum.SUCCESS_OPTION);
+    }
+
+    @Token
+    @RequestMapping(value = "/sum/time/month", method = RequestMethod.GET)
+    public ResponseJSON<BillMonthForm> getSumBillByMonth(@RequestAttribute
+                                                                 Long userId,
+                                                         @Valid
+                                                         @RequestParam
+                                                         @NotNull(message = "时间不能为空")
+                                                         @JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM")
+                                                                 Date time) {
+        log.debug("查询用户某月的总账单,userId={},time={}", userId, time);
+        return new ResponseJSON<>(billService.getSumBillByMonth(userId, time), ResponseEnum.SUCCESS_OPTION);
+    }
 }

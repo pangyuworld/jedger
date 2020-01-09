@@ -10,9 +10,11 @@ import com.ledger.core.common.rest.ResponseEnum;
 import com.ledger.core.mapper.UserInfoMapper;
 import com.ledger.core.service.UserService;
 import com.ledger.core.util.password.PasswordUtil;
+import com.ledger.core.util.redis.RedisTool;
 import com.ledger.core.util.token.TokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,10 @@ public class UserServiceImpl implements UserService {
     private PasswordUtil passwordUtil;
     @Autowired
     private TokenUtil tokenUtil;
+    @Autowired
+    private RedisTool redisTool;
+    @Value("${token.ttl}")
+    private Long tokenTTL;
 
 
     /**
@@ -93,6 +99,11 @@ public class UserServiceImpl implements UserService {
         userInfoForm.setUserGender(userInfo.getUserGender() ? UserInfoForm.MAN : UserInfoForm.WOMAN);
         userInfoForm.setUserRealName(userInfo.getUserRealName());
         userInfoForm.setToken(token);
+        // 将token保存至redis中
+        redisTool.setHash(token, "value", userInfo.getUserId());
+        redisTool.expire(token, tokenTTL);
+        log.debug("将token添加到redis中，token={},userId={},ttl={}", token,
+                userInfo.getUserId(), tokenTTL);
         log.debug("登录成功,userLoginForm={}", userLoginForm);
         return userInfoForm;
     }

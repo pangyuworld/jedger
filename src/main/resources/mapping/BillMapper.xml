@@ -49,6 +49,7 @@
         where a.user_id = #{userId}
         order by bill_time desc
     </select>
+    <!--  返回用户某一时间段的账单  -->
     <select id="getBillByTime" resultMap="billEntire">
         select bill_id,
                bill_time,
@@ -70,5 +71,23 @@
             and #{endTime,javaType=date}
         order by bill_time desc
     </select>
-
+    <!--  获取用户某一天的账单金额之和（+收入-支出）  -->
+    <select id="getSumBillByDay" resultMap="bill">
+        select bill_time,
+               sum(bill_price) as bill_price
+        from t_bill
+        where user_id = #{userId}
+          and bill_time between #{time} and #{nextTime}
+        group by user_id
+    </select>
+    <!--  获取用户某月的账单金额之和（+收入-支出）  -->
+    <select id="getSumBillByMonth" resultMap="bill">
+        select bill_time,
+               sum(bill_price) as bill_price
+        from t_bill
+        where user_id = #{userId}
+          and bill_time between #{time} and #{nextTime}
+        GROUP BY date_format(bill_time, '%Y-%m-%d')
+        ORDER BY bill_time desc
+    </select>
 </mapper>

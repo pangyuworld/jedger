@@ -22,9 +22,13 @@ import java.util.Date;
 @EqualsAndHashCode
 public class BillEntireForm {
     /**
+     * 账单ID（这个要用户删除和更改）
+     */
+    private Long billId;
+    /**
      * 记录账单的时间
      */
-    @JsonFormat(timezone = "GMT+8",pattern = "yyyy/MM/dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd HH:mm:ss")
     private Date billTime;
     /**
      * 记录账单的金额

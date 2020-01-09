@@ -7,8 +7,6 @@ import com.ledger.core.util.redis.RedisTool;
 import com.ledger.core.util.token.Token;
 import com.ledger.core.util.token.TokenUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -87,7 +85,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
         log.debug("token认证通过,userId={}", decodedJWT.getAudience());
         // 这里将token保存到redis中，提高后续性能
         redis.setHash(tokenStr, "value", decodedJWT.getAudience());
-        long ttl = decodedJWT.getExpiresAt().getTime() - decodedJWT.getIssuedAt().getTime();
+        long ttl = decodedJWT.getExpiresAt().getTime() - System.currentTimeMillis();
         redis.expire(tokenStr, ttl);
         log.debug("将token添加到redis中，token={},userId={},ttl={}", tokenStr,
                 decodedJWT.getAudience(), ttl);

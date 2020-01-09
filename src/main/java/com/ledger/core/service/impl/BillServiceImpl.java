@@ -4,6 +4,8 @@ import com.ledger.core.beans.po.Bill;
 import com.ledger.core.beans.po.BillEntire;
 import com.ledger.core.beans.vo.bill.BillAddForm;
 import com.ledger.core.beans.vo.bill.BillEntireForm;
+import com.ledger.core.beans.vo.bill.BillForm;
+import com.ledger.core.beans.vo.bill.BillMonthForm;
 import com.ledger.core.beans.vo.category.CategoryForm;
 import com.ledger.core.beans.vo.user.UserInfoForm;
 import com.ledger.core.common.exception.UserActionException;
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -100,6 +103,69 @@ public class BillServiceImpl implements BillService {
     }
 
     /**
+     * 获取用户某天的总账单（金额计算为和）
+     *
+     * @param userId 用户ID
+     * @param time   时间，精确到天
+     * @return 用户该日的总账单
+     */
+    @Override
+    public BillForm getSumBillByDay(Long userId, Date time) {
+        // 获取后一天的时间
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(time);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        Date nextTime = calendar.getTime();
+        log.debug("获取用户某天的总账单,userId={},time={},nextTime={}", userId, time, nextTime);
+        // 从数据库获取数据
+        Bill sumBillByDay = billMapper.getSumBillByDay(userId, time, nextTime);
+        // PO转为VO
+        BillForm billForm = new BillForm();
+        billForm.setBillPrice(sumBillByDay.getBillPrice());
+        billForm.setBillTime(sumBillByDay.getBillTime());
+        log.debug("得到用户某天的总账单,userId={},time={},billForm={}", userId, time, billForm);
+        return billForm;
+    }
+
+    /**
+     * 获取用户某月的总账单(按天明细)
+     *
+     * @param userId 用户ID
+     * @param time   时间，精确到月
+     * @return 用户该月的账单
+     */
+    @Override
+    public BillMonthForm getSumBillByMonth(Long userId, Date time) {
+        // 获取本月第一天
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(time);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+        time = calendar.getTime();
+        // 本月最后一天
+        calendar.add(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        Date nextTime = calendar.getTime();
+        log.debug("获取用户某月的总账单,userId={},time={},nextTime={}", userId, time, nextTime);
+        // 从数据库读取数据
+        List<Bill> monthBillList = billMapper.getSumBillByMonth(userId, time, nextTime);
+        // PO转换为VO
+        BillMonthForm billMonthForm = new BillMonthForm();
+        billMonthForm.setMonth(time);
+        List<BillForm> billFormList = new LinkedList<>();
+        Double totalPrice = 0.0;
+        for (Bill bill : monthBillList) {
+            BillForm billForm = new BillForm();
+            billForm.setBillPrice(bill.getBillPrice());
+            billForm.setBillTime(bill.getBillTime());
+            totalPrice += bill.getBillPrice();
+            billFormList.add(billForm);
+        }
+        billMonthForm.setDayBill(billFormList);
+        billMonthForm.setTotalPrice(totalPrice);
+        log.debug("得到用户某月的总账单,userId={},time={},billMonthForm={}", userId, time, billMonthForm);
+        return billMonthForm;
+    }
+
+    /**
      * 将PO转换为VO
      */
     private List<BillEntireForm> billEntireList2BillEntireFormList(List<BillEntire> billEntireList) {
@@ -111,6 +177,7 @@ public class BillServiceImpl implements BillService {
             billEntireForm.setBillPrice(billEntire.getBillPrice());
             billEntireForm.setBillRemark(billEntire.getBillRemark());
             billEntireForm.setBillTime(billEntire.getBillTime());
+            billEntireForm.setBillId(billEntire.getBillId());
             userInfoForm.setUserGender(billEntire.getUserInfo()
                     .getUserGender() ? UserInfoForm.MAN : UserInfoForm.WOMAN);
             userInfoForm.setUserRealName(billEntire.getUserInfo().getUserRealName());

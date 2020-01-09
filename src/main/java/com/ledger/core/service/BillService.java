@@ -2,6 +2,8 @@ package com.ledger.core.service;
 
 import com.ledger.core.beans.vo.bill.BillAddForm;
 import com.ledger.core.beans.vo.bill.BillEntireForm;
+import com.ledger.core.beans.vo.bill.BillForm;
+import com.ledger.core.beans.vo.bill.BillMonthForm;
 
 import java.util.Date;
 import java.util.List;
@@ -41,4 +43,22 @@ public interface BillService {
      * @return 用户在该段时间的账单
      */
     List<BillEntireForm> getBillByTime(Date startTime, Date endTime, Long userId);
+
+    /**
+     * 获取用户某天的总账单（金额计算为和）
+     *
+     * @param userId 用户ID
+     * @param time   时间，精确到天
+     * @return 用户该日的总账单
+     */
+    BillForm getSumBillByDay(Long userId, Date time);
+
+    /**
+     * 获取用户某月的总账单(按天明细)
+     *
+     * @param userId 用户ID
+     * @param time   时间，精确到月
+     * @return 用户该月的账单
+     */
+    BillMonthForm getSumBillByMonth(Long userId, Date time);
 }
