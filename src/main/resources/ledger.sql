@@ -11,7 +11,7 @@
  Target Server Version : 50553
  File Encoding         : 65001
 
- Date: 09/01/2020 00:54:12
+ Date: 09/01/2020 16:20:09
 */
 
 SET NAMES utf8mb4;
@@ -32,6 +32,20 @@ CREATE TABLE `t_bill`  (
   INDEX `user_id_index`(`user_id`) USING BTREE COMMENT '用户ID索引',
   INDEX `category_id_index`(`category_id`) USING BTREE COMMENT '类型ID索引'
 ) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+-- ----------------------------
+-- Table structure for t_budget
+-- ----------------------------
+DROP TABLE IF EXISTS `t_budget`;
+CREATE TABLE `t_budget`  (
+  `budget_id` int(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '预算ID',
+  `budget_time` date NOT NULL COMMENT '预算所处的月份',
+  `budget_price` double(10, 2) NOT NULL COMMENT '预算金额',
+  `user_id` int(20) NOT NULL COMMENT '预算设置人',
+  `budget_remark` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '预算备注',
+  PRIMARY KEY (`budget_id`) USING BTREE,
+  UNIQUE INDEX `user_month_unique`(`budget_time`, `user_id`) USING BTREE COMMENT '用户每月只能记录一次预算'
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for t_category
