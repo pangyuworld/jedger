@@ -71,7 +71,7 @@ public class BillController {
     public ResponseJSON<List<BillEntireForm>> getAllBillByDay(@RequestAttribute
                                                                       Long userId,
                                                               @Valid
-                                                              @RequestParam
+                                                              @RequestParam(required = false)
                                                               @JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd")
                                                                       Date time) {
         log.debug("获取用户某一天的账单,userId={},time={}", userId, time);
@@ -116,5 +116,12 @@ public class BillController {
     public ResponseJSON<BillEntireForm> updateBill(@RequestAttribute Long userId, @RequestBody @Valid BillUpdateForm billUpdateForm) {
         log.info("更新账单信息,userId={},billForm={}", userId, billUpdateForm);
         return new ResponseJSON<>(billService.updateBill(userId, billUpdateForm), ResponseEnum.SUCCESS_OPTION);
+    }
+
+    @Token
+    @RequestMapping(value = "/firstTime",method = RequestMethod.GET)
+    public ResponseJSON<String> getFirstTime(@RequestAttribute Long userId){
+        log.debug("查找用户第一次记录的月份,userId={}",userId);
+        return new ResponseJSON<>(billService.getFirstTime(userId),ResponseEnum.SUCCESS_OPTION);
     }
 }

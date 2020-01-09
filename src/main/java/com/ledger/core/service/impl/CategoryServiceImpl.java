@@ -88,6 +88,19 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     /**
+     * 获取全部账目品类
+     *
+     * @return 全部账目品类
+     */
+    @Override
+    public List<List<CategoryForm>> getAllCategory() {
+        List<List<CategoryForm>> categoryListList = new LinkedList<>();
+        categoryListList.add(this.getIncomesCategory());
+        categoryListList.add(this.getExpensesCategory());
+        return categoryListList;
+    }
+
+    /**
      * 更新账目品类信息（仅能更新账目品类名，暂不支持修改账目品类类型）
      *
      * @param categoryUpdateForm 要进行更新的内容

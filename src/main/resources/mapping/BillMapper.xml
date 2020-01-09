@@ -133,4 +133,11 @@
         where a.user_id = #{userId}
           and a.bill_id = #{billId}
     </select>
+    <select id="getStartTime" resultType="string">
+        select DATE_FORMAT(bill_time,'%Y/%m/%e')
+        from t_bill
+        where user_id = #{userId}
+        ORDER BY bill_time
+        limit 1
+    </select>
 </mapper>

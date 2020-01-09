@@ -58,4 +58,10 @@ public class CategoryController {
         log.debug("更新账目品类信息,categoryUpdateForm={}", categoryUpdateForm);
         return new ResponseJSON<>(categoryService.editCategory(categoryUpdateForm), ResponseEnum.SUCCESS_OPTION);
     }
+
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public ResponseJSON<List<List<CategoryForm>>> getAllCategory(){
+        log.debug("获取全部账目品类列表");
+        return new ResponseJSON<>(categoryService.getAllCategory(),ResponseEnum.SUCCESS_OPTION);
+    }
 }

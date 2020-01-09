@@ -86,4 +86,10 @@ public interface BillService {
      */
     BillEntireForm updateBill(Long userId, BillUpdateForm billUpdateForm);
 
+    /**
+     * 获取第一条记录的月份
+     * @param userId
+     * @return
+     */
+    String getFirstTime(Long userId);
 }

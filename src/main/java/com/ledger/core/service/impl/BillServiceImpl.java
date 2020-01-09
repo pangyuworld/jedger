@@ -256,6 +256,16 @@ public class BillServiceImpl implements BillService {
     }
 
     /**
+     * 获取第一条记录的月份
+     */
+    @Override
+    public String getFirstTime(Long userId) {
+        String startTime = billMapper.getStartTime(userId);
+        log.debug("获取用户第一条记录的月份,userId={},start=time={}", userId, startTime);
+        return startTime;
+    }
+
+    /**
      * 将PO-LIST转换为VO-LIST
      */
     private List<BillEntireForm> billEntireList2BillEntireFormList(List<BillEntire> billEntireList) {

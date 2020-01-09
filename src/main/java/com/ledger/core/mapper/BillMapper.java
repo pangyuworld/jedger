@@ -85,4 +85,11 @@ public interface BillMapper {
      * @return 账单信息
      */
     BillEntire getBillById(Long userId, Long billId);
+
+    /**
+     * 获取用户账单开始时间
+     * @param userId
+     * @return
+     */
+    String getStartTime(Long userId);
 }
