@@ -33,4 +33,12 @@ public class BillMonthForm {
      * 消费总和（+收入-支出）
      */
     private Double totalPrice;
+    /**
+     * 支出总和
+     */
+    private Double totalExpenses;
+    /**
+     * 收入总和
+     */
+    private Double totalIncomes;
 }

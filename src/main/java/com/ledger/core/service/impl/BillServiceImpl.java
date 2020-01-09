@@ -2,10 +2,7 @@ package com.ledger.core.service.impl;
 
 import com.ledger.core.beans.po.Bill;
 import com.ledger.core.beans.po.BillEntire;
-import com.ledger.core.beans.vo.bill.BillAddForm;
-import com.ledger.core.beans.vo.bill.BillEntireForm;
-import com.ledger.core.beans.vo.bill.BillForm;
-import com.ledger.core.beans.vo.bill.BillMonthForm;
+import com.ledger.core.beans.vo.bill.*;
 import com.ledger.core.beans.vo.category.CategoryForm;
 import com.ledger.core.beans.vo.user.UserInfoForm;
 import com.ledger.core.common.exception.UserActionException;
@@ -77,7 +74,6 @@ public class BillServiceImpl implements BillService {
     public List<BillEntireForm> getAllBill(Long userId) {
         // 获取全部订单
         List<BillEntire> billEntireList = billMapper.getAllBill(userId);
-
         List<BillEntireForm> billEntireFormList = billEntireList2BillEntireFormList(billEntireList);
         log.debug("获取用户全部订单,userId={},billEntireFormList={}", userId, billEntireFormList);
         // 将订单PO转换为VO
@@ -100,6 +96,32 @@ public class BillServiceImpl implements BillService {
         List<BillEntireForm> billEntireFormList = billEntireList2BillEntireFormList(billEntireList);
         log.debug("获取一段时间内的订单全部订单,userId={},startTime={},endTime={}", userId, startTime, endTime);
         return billEntireFormList;
+    }
+
+    /**
+     * 获取用户某一天的账单
+     *
+     * @param time   时间（精确到天（默认为今天））
+     * @param userId 用户Id
+     * @return 用户在该天的账单
+     */
+    @Override
+    public List<BillEntireForm> getBillByDay(Date time, Long userId) {
+        // 判断时间是否有值
+        if (time == null) {
+            time = new Date();
+        }
+        // 获取后一天的时间
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(time);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        Date nextTime = calendar.getTime();
+        // 获取该天的开始时间
+        calendar.setTime(time);
+        calendar.add(Calendar.DAY_OF_MONTH, 0);
+        time = calendar.getTime();
+        log.debug("获取用户某一天的账单,userId={},time={},endTime={}", userId, time, nextTime);
+        return getBillByTime(time, nextTime, userId);
     }
 
     /**
@@ -151,43 +173,119 @@ public class BillServiceImpl implements BillService {
         BillMonthForm billMonthForm = new BillMonthForm();
         billMonthForm.setMonth(time);
         List<BillForm> billFormList = new LinkedList<>();
-        Double totalPrice = 0.0;
+        double totalPrice = 0.0;
+        double totalExpenses = 0.0;
+        double totalIncomes = 0.0;
         for (Bill bill : monthBillList) {
             BillForm billForm = new BillForm();
             billForm.setBillPrice(bill.getBillPrice());
             billForm.setBillTime(bill.getBillTime());
-            totalPrice += bill.getBillPrice();
+            if (bill.getBillPrice() >= 0) {
+                // 如果是收入
+                totalIncomes += bill.getBillPrice();
+            } else {
+                // 如果是支出
+                totalExpenses -= bill.getBillPrice();
+            }
             billFormList.add(billForm);
         }
+        // 总记账为 收入-支出
+        totalPrice = totalIncomes - totalExpenses;
         billMonthForm.setDayBill(billFormList);
+        billMonthForm.setTotalExpenses(totalExpenses);
+        billMonthForm.setTotalIncomes(totalIncomes);
         billMonthForm.setTotalPrice(totalPrice);
         log.debug("得到用户某月的总账单,userId={},time={},billMonthForm={}", userId, time, billMonthForm);
         return billMonthForm;
     }
 
     /**
-     * 将PO转换为VO
+     * 删除账单，必须要用户ID和账单ID共同匹配
+     *
+     * @param userId 用户ID
+     * @param billId 账单ID
+     * @return 删除是否成功
+     */
+    @Override
+    public Boolean deleteBill(Long userId, Long billId) {
+        log.info("准备删除账单,userId={},billId={}", userId, billId);
+        boolean result = billMapper.deleteBill(userId, billId) > 0;
+        log.debug("删除账单,userId={},billId={},result={}", userId, billId, result);
+        if (!result) {
+            log.info("删除账单失败,失败原因未知,userId={},billId={}", userId, billId);
+            throw new UserActionException(ResponseEnum.FAILED_DELETE);
+        }
+        return Boolean.TRUE;
+    }
+
+    /**
+     * 更新账单信息
+     *
+     * @param userId         用户ID
+     * @param billUpdateForm 账单更新的表单
+     * @return 更新后的账单信息
+     */
+    @Override
+    public BillEntireForm updateBill(Long userId, BillUpdateForm billUpdateForm) {
+        log.debug("更新账单信息,userId={},billInfo={}", userId, billUpdateForm);
+        // 验证账单品类是否存在
+        Boolean exists = categoryMapper.existsByCategoryId(billUpdateForm.getCategoryId());
+        log.debug("验证账单品类是否存在,categoryId={},exists={}", billUpdateForm.getCategoryId(), exists);
+        if (exists == null) {
+            log.debug("账单品类不存在,billAddForm={}", billUpdateForm);
+            throw new UserActionException(ResponseEnum.BAD_REQUEST);
+        }
+        // 将VO转换为PO
+        Bill bill = new Bill();
+        bill.setBillPrice(exists ? -1 * billUpdateForm.getBillPrice() : billUpdateForm.getBillPrice());
+        bill.setBillId(billUpdateForm.getBillId());
+        bill.setUserId(userId);
+        bill.setCategoryId(billUpdateForm.getCategoryId());
+        bill.setBillRemark(billUpdateForm.getBillRemark());
+        bill.setBillTime(billUpdateForm.getBillTime());
+        bill.setBillPrice(billUpdateForm.getBillPrice());
+        // 从数据库进行转换
+        billMapper.editBill(bill);
+        log.debug("更新账单信息,bill={}", bill);
+        // 查找到最新的账单信息
+        BillEntire billEntire = billMapper.getBillById(userId, bill.getBillId());
+        // 将PO转换为VO
+        BillEntireForm billEntireForm = billEntire2BillEntireForm(billEntire);
+        log.debug("查找更新后的账单信息,billEntireForm={}", billEntireForm);
+        return billEntireForm;
+    }
+
+    /**
+     * 将PO-LIST转换为VO-LIST
      */
     private List<BillEntireForm> billEntireList2BillEntireFormList(List<BillEntire> billEntireList) {
         List<BillEntireForm> billEntireFormList = new LinkedList<>();
         for (BillEntire billEntire : billEntireList) {
-            BillEntireForm billEntireForm = new BillEntireForm();
-            UserInfoForm userInfoForm = new UserInfoForm();
-            CategoryForm categoryForm = new CategoryForm();
-            billEntireForm.setBillPrice(billEntire.getBillPrice());
-            billEntireForm.setBillRemark(billEntire.getBillRemark());
-            billEntireForm.setBillTime(billEntire.getBillTime());
-            billEntireForm.setBillId(billEntire.getBillId());
-            userInfoForm.setUserGender(billEntire.getUserInfo()
-                    .getUserGender() ? UserInfoForm.MAN : UserInfoForm.WOMAN);
-            userInfoForm.setUserRealName(billEntire.getUserInfo().getUserRealName());
-            billEntireForm.setUserInfo(userInfoForm);
-            categoryForm.setCategoryName(billEntire.getCategory().getCategoryName());
-            categoryForm.setCategoryType(billEntire.getCategory()
-                    .getCategoryType() ? CategoryForm.INCOME : CategoryForm.EXPENSES);
-            billEntireForm.setCategory(categoryForm);
+            BillEntireForm billEntireForm = billEntire2BillEntireForm(billEntire);
             billEntireFormList.add(billEntireForm);
         }
         return billEntireFormList;
+    }
+
+    /**
+     * 将PO转换为VO
+     */
+    private BillEntireForm billEntire2BillEntireForm(BillEntire billEntire) {
+        BillEntireForm billEntireForm = new BillEntireForm();
+        UserInfoForm userInfoForm = new UserInfoForm();
+        CategoryForm categoryForm = new CategoryForm();
+        billEntireForm.setBillPrice(billEntire.getBillPrice());
+        billEntireForm.setBillRemark(billEntire.getBillRemark());
+        billEntireForm.setBillTime(billEntire.getBillTime());
+        billEntireForm.setBillId(billEntire.getBillId());
+        userInfoForm.setUserGender(billEntire.getUserInfo()
+                .getUserGender() ? UserInfoForm.MAN : UserInfoForm.WOMAN);
+        userInfoForm.setUserRealName(billEntire.getUserInfo().getUserRealName());
+        billEntireForm.setUserInfo(userInfoForm);
+        categoryForm.setCategoryName(billEntire.getCategory().getCategoryName());
+        categoryForm.setCategoryType(billEntire.getCategory()
+                .getCategoryType() ? CategoryForm.INCOME : CategoryForm.EXPENSES);
+        billEntireForm.setCategory(categoryForm);
+        return billEntireForm;
     }
 }

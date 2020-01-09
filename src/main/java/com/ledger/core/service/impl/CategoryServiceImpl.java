@@ -2,6 +2,7 @@ package com.ledger.core.service.impl;
 
 import com.ledger.core.beans.po.Category;
 import com.ledger.core.beans.vo.category.CategoryForm;
+import com.ledger.core.beans.vo.category.CategoryUpdateForm;
 import com.ledger.core.common.exception.UserActionException;
 import com.ledger.core.common.rest.ResponseEnum;
 import com.ledger.core.mapper.CategoryMapper;
@@ -84,6 +85,32 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryForm> categoryFormList = categoryList2CategoryFormList(categoryList);
         log.debug("获取收入账目品类列表,categoryFormList={}", categoryFormList);
         return categoryFormList;
+    }
+
+    /**
+     * 更新账目品类信息（仅能更新账目品类名，暂不支持修改账目品类类型）
+     *
+     * @param categoryUpdateForm 要进行更新的内容
+     * @return 更新后的账目品类信息
+     */
+    @Override
+    public CategoryForm editCategory(CategoryUpdateForm categoryUpdateForm) {
+        log.debug("更新账目品类信息,category={}", categoryUpdateForm);
+        // 将VO转为PO
+        Category category = new Category();
+        category.setCategoryId(categoryUpdateForm.getCategoryId());
+        category.setCategoryName(categoryUpdateForm.getCategoryName());
+        // 进行数据库更新
+        categoryMapper.updateCategory(category);
+        log.debug("更新账目品类信息成功,category={}", category);
+        // 查询最新的信息
+        category = categoryMapper.getCategoryByCategoryId(categoryUpdateForm.getCategoryId());
+        CategoryForm categoryForm = new CategoryForm();
+        categoryForm.setCategoryId(category.getCategoryId());
+        categoryForm.setCategoryName(category.getCategoryName());
+        categoryForm.setCategoryType(category.getCategoryType() ? CategoryForm.EXPENSES : CategoryForm.INCOME);
+        log.debug("查询最新的账目品类信息,categoryForm={}", categoryForm);
+        return categoryForm;
     }
 
     /**

@@ -1,10 +1,7 @@
 package com.ledger.core.controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ledger.core.beans.vo.bill.BillAddForm;
-import com.ledger.core.beans.vo.bill.BillEntireForm;
-import com.ledger.core.beans.vo.bill.BillForm;
-import com.ledger.core.beans.vo.bill.BillMonthForm;
+import com.ledger.core.beans.vo.bill.*;
 import com.ledger.core.common.rest.ResponseEnum;
 import com.ledger.core.common.rest.ResponseJSON;
 import com.ledger.core.service.BillService;
@@ -70,6 +67,18 @@ public class BillController {
     }
 
     @Token
+    @RequestMapping(value = "/day", method = RequestMethod.GET)
+    public ResponseJSON<List<BillEntireForm>> getAllBillByDay(@RequestAttribute
+                                                                      Long userId,
+                                                              @Valid
+                                                              @RequestParam
+                                                              @JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd")
+                                                                      Date time) {
+        log.debug("获取用户某一天的账单,userId={},time={}", userId, time);
+        return new ResponseJSON<>(billService.getBillByDay(time, userId), ResponseEnum.SUCCESS_OPTION);
+    }
+
+    @Token
     @RequestMapping(value = "/sum/time/day", method = RequestMethod.GET)
     public ResponseJSON<BillForm> getSumBillByDay(@RequestAttribute
                                                           Long userId,
@@ -93,5 +102,19 @@ public class BillController {
                                                                  Date time) {
         log.debug("查询用户某月的总账单,userId={},time={}", userId, time);
         return new ResponseJSON<>(billService.getSumBillByMonth(userId, time), ResponseEnum.SUCCESS_OPTION);
+    }
+
+    @Token
+    @RequestMapping(value = "/{billId:[0-9]+$}", method = RequestMethod.DELETE)
+    public ResponseJSON<Boolean> deleteBill(@RequestAttribute Long userId, @PathVariable Long billId) {
+        log.info("准备删除账单,userId={},billId={}", userId, billId);
+        return new ResponseJSON<>(billService.deleteBill(userId, billId), ResponseEnum.SUCCESS_OPTION);
+    }
+
+    @Token
+    @RequestMapping(method = RequestMethod.PUT)
+    public ResponseJSON<BillEntireForm> updateBill(@RequestAttribute Long userId, @RequestBody @Valid BillUpdateForm billUpdateForm) {
+        log.info("更新账单信息,userId={},billForm={}", userId, billUpdateForm);
+        return new ResponseJSON<>(billService.updateBill(userId, billUpdateForm), ResponseEnum.SUCCESS_OPTION);
     }
 }

@@ -1,6 +1,7 @@
 package com.ledger.core.service;
 
 import com.ledger.core.beans.vo.category.CategoryForm;
+import com.ledger.core.beans.vo.category.CategoryUpdateForm;
 
 import java.util.List;
 
@@ -34,4 +35,13 @@ public interface CategoryService {
      * @return 收入账目品类列表
      */
     List<CategoryForm> getIncomesCategory();
+
+    /**
+     * 更新账目品类信息（仅能更新账目品类名，暂不支持修改账目品类类型）
+     *
+     * @param categoryUpdateForm 要进行更新的内容
+     * @return 更新后的账目品类信息
+     */
+    CategoryForm editCategory(CategoryUpdateForm categoryUpdateForm);
+
 }

@@ -1,6 +1,7 @@
 package com.ledger.core.controller;
 
 import com.ledger.core.beans.vo.category.CategoryForm;
+import com.ledger.core.beans.vo.category.CategoryUpdateForm;
 import com.ledger.core.common.rest.ResponseEnum;
 import com.ledger.core.common.rest.ResponseJSON;
 import com.ledger.core.service.CategoryService;
@@ -50,5 +51,11 @@ public class CategoryController {
         List<CategoryForm> categoryFormList = categoryService.getIncomesCategory();
         log.debug("获取收入账目品类列表,categoryFormList={}", categoryFormList);
         return new ResponseJSON<>(categoryFormList, ResponseEnum.SUCCESS_OPTION);
+    }
+
+    @RequestMapping(method = RequestMethod.PUT)
+    public ResponseJSON<CategoryForm> updateCategory(@RequestBody @Valid CategoryUpdateForm categoryUpdateForm) {
+        log.debug("更新账目品类信息,categoryUpdateForm={}", categoryUpdateForm);
+        return new ResponseJSON<>(categoryService.editCategory(categoryUpdateForm), ResponseEnum.SUCCESS_OPTION);
     }
 }

@@ -59,4 +59,30 @@ public interface BillMapper {
      * @return 用户一整月的账单总和
      */
     List<Bill> getSumBillByMonth(Long userId, Date time, Date nextTime);
+
+    /**
+     * 删除账单，必须要用户ID和账单ID共同匹配
+     *
+     * @param userId 用户ID
+     * @param billId 账单ID
+     * @return 删除成功返回1, 不成功返回0
+     */
+    Integer deleteBill(Long userId, Long billId);
+
+    /**
+     * 更新账单信息，必须要用户ID和账单ID共同匹配
+     *
+     * @param bill 账单信息
+     * @return 只要数据库操作成功就返回1
+     */
+    Integer editBill(Bill bill);
+
+    /**
+     * 根据ID获取账单信息，必须要用户ID和账单ID共同匹配
+     *
+     * @param userId 用户ID
+     * @param billId 账单ID
+     * @return 账单信息
+     */
+    BillEntire getBillById(Long userId, Long billId);
 }

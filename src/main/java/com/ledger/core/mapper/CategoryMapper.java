@@ -42,4 +42,21 @@ public interface CategoryMapper {
      * @return 存在返回1，不存在返回0
      */
     Boolean existsByCategoryId(Long categoryId);
+
+    /**
+     * 更新账目品类信息
+     *
+     * @param category 账目品类ID
+     * @return 执行成功返回1
+     */
+    Integer updateCategory(Category category);
+
+    /**
+     * 根据ID获取当前账目品类信息
+     *
+     * @param categoryId 账目品类ID
+     * @return 账目品类信息
+     */
+    Category getCategoryByCategoryId(Long categoryId);
+
 }

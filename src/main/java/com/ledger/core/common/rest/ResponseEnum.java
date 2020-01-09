@@ -20,7 +20,8 @@ public enum ResponseEnum {
     NOT_FOUND(404, "找不到资源", false),
     METHOD_NOT_ALLOWED(405, "Http请求方法不受支持", false),
     NOT_FOUND_SCHOOL(404, "找不到学校", false),
-    FAILED_CAPTCHA(400, "验证码错误", false);
+    FAILED_CAPTCHA(400, "验证码错误", false),
+    FAILED_DELETE(400,"删除失败",false);
 
 
     ResponseEnum(Integer status, String message, Boolean success) {

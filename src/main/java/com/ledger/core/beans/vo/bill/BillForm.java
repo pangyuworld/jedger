@@ -22,7 +22,7 @@ public class BillForm {
     /**
      * 记录账单的时间
      */
-    @JsonFormat(timezone = "GMT+8",pattern = "yyyy/MM/dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd HH:mm:ss")
     private Date billTime;
     /**
      * 记录账单的金额（总金额）

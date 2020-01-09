@@ -34,6 +34,7 @@ public class CategoryForm {
      */
     @NotNull(message = "账目品类类型不能为空")
     @Length(min = 2, max = 2, message = "账目品类类型必须为“支出”或“收入”")
+    @Pattern(regexp = "^[\\u4E00-\\u9FA5]+$", message = "账目品类类型必须为“支出”或“收入”")
     private String categoryType;
     /**
      * 品类名

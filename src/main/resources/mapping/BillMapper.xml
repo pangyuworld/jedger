@@ -29,6 +29,29 @@
         insert into t_bill(bill_time, bill_price, bill_remark, user_id, category_id)
         VALUES (#{billTime}, #{billPrice}, #{billRemark}, #{userId}, #{categoryId})
     </insert>
+    <!--  更新账单信息  -->
+    <update id="editBill" parameterType="com.ledger.core.beans.po.Bill">
+        update t_bill
+        <set>
+            <if test="billPrice != null">
+                bill_price=#{billPrice},
+            </if>
+            <if test="billRemark != null">
+                bill_remark=#{billRemark},
+            </if>
+            <if test="billTime != null">
+                bill_time=#{billTime},
+            </if>
+        </set>
+        where user_id=#{userId} and bill_id=#{billId}
+    </update>
+    <!--  删除账单  -->
+    <delete id="deleteBill">
+        delete
+        from t_bill
+        where user_id = #{userId}
+          and bill_id = #{billId}
+    </delete>
     <!--  返回用户的全部账单  -->
     <select id="getAllBill" resultMap="billEntire">
         select bill_id,
@@ -89,5 +112,25 @@
           and bill_time between #{time} and #{nextTime}
         GROUP BY date_format(bill_time, '%Y-%m-%d')
         ORDER BY bill_time desc
+    </select>
+    <!--  根据ID获取账单信息  -->
+    <select id="getBillById" resultMap="billEntire">
+        select bill_id,
+               bill_time,
+               bill_price,
+               bill_remark,
+               a.user_id     as user_id,
+               a.category_id as category_id,
+               category_type,
+               category_name,
+               user_gender,
+               user_name,
+               user_password,
+               user_real_name
+        from t_bill a
+                 inner join t_category tc on a.category_id = tc.category_id
+                 inner join t_user tu on a.user_id = tu.user_id
+        where a.user_id = #{userId}
+          and a.bill_id = #{billId}
     </select>
 </mapper>
